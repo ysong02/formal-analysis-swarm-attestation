@@ -1,4 +1,3 @@
-
 // Security properties for SALSA: Standards-based Authentication and Lightweight Swarm Attestation for IoT Devices
 
 // ********************************************************************
@@ -45,24 +44,38 @@ lemma executableR_method_0[output=[proverif]]: // sanity check
 lemma executableI_method_0[output=[proverif]]: // sanity check
   exists-trace
   "Ex cid e1 e2 pkI pkR k3 ko k4 #i #j #l. AcceptI(cid,method_zero,pkI,pkR,k3,k4,ko,e1,e2)@i & Honest(pkI)@j & Honest(pkR)@l"
-  
+
 #endif
 
 
 // ******************************************************************
 // ************** Attestation ***************************************
 // ******************************************************************
+ 
 
-  // Evidence uniqueness -> One initiator cannot accept two different evidences generated. 
-lemma EvidenceUniqueness:
-  "All cid pkI pkR ab downlink_slot cidR1 pkI1 pkR1 sig1 ak1 y1 gxy1 ab1 cidR2 pkI2 pkR2 sig2 ak2 y2 gxy2 ab2 #i #j #k.
-    ReceivedMsg4_bg(cid, pkI, pkR, ab)@k
+// Evidence sending uniqueness -> One request sent by Initiator cannot generate two different evidences
+lemma EvidenceUniqueness1:
+  "All cidI pkI pkR th3 ab pkI1 pkR1 sig1 ak1 pkI2 pkR2 sig2 ak2 downlink_slot #i #j #k.
+    SentMsg3_bg(cidI, pkI, pkR, th3, downlink_slot)@k
     &
-    EvidenceGenerated_bg(cidR1, pkI1, pkR1, sig1, ak1, y1, gxy1, ab1, downlink_slot)@i
+    EvidenceGenerated_bg(pkI1, pkR1, sig1, ak1, ab, th3, downlink_slot)@i
     &
-    EvidenceGenerated_bg(cidR2, pkI2, pkR2, sig2, ak2, y2, gxy2, ab2, downlink_slot)@j
+    EvidenceGenerated_bg(pkI2, pkR2, sig2, ak2, ab, th3, downlink_slot)@j
   ==>
-  #i = #j
+    (#i = #j) & (pkI1 = pkI2) & (pkR1 = pkR2) & (sig1 = sig2) & (ak1 = ak2) & (pkI1 = pkI) & (pkR1 = pkR)
+  "
+
+// result is true
+// Evidence uniqueness -> One initiator cannot accept two different evidences generated. 
+lemma EvidenceUniqueness2:
+  "All cidI pkI pkR ab pkI1 pkR1 sig1 ak1 th31 pkI2 pkR2 sig2 ak2 th32 downlink_slot #i #j #k.
+    ReceivedMsg4_bg(cidI, pkI, pkR, ab)@k
+    &
+    EvidenceGenerated_bg(pkI1, pkR1, sig1, ak1, ab, th31, downlink_slot)@i
+    &
+    EvidenceGenerated_bg(pkI2, pkR2, sig2, ak2, ab, th32, downlink_slot)@j
+  ==>
+    (#i = #j) & (pkI1 = pkI2) & (pkR1 = pkR2) & (sig1 = sig2) & (ak1 = ak2) & (pkI1 = pkI) & (pkR1 = pkR)
   "
 
 
@@ -77,8 +90,8 @@ lemma AttestationEvidenceIntegrity:
     &
     Honest(pkR)@k
   ==>
-  (Ex cidR ak y gxy dl #t.
-    EvidenceGenerated_bg(cidR, pkI, pkR, sig, ak, y, gxy, ab, dl)@t
+  (Ex ak th3 downlink_slot #t.
+    EvidenceGenerated_bg(pkI, pkR, sig, ak, ab, th3, downlink_slot)@t
     & t < i)
   |
   (Ex ak #t. LeakAttKey(ak)@t)
@@ -149,6 +162,9 @@ lemma ResultIntegrity:
 // Result uniqueness -> the Verifier cannot generate two different results for the same
 // request: any two ResultGenerated events sharing the same uplink_slot must agree on
 // every other field too.
+
+// checked: with #i=#j, it is cannot be proven
+// remove the #i=#j, it is true
 lemma ResultUniqueness:
   "All pkI1 sig1 ab1 pkI2 sig2 ab2 uplink_slot #i #j.
     ResultGenerated(pkI1, sig1, ab1, uplink_slot)@i
@@ -157,7 +173,6 @@ lemma ResultUniqueness:
   ==>
   (pkI1 = pkI2) & (sig1 = sig2) & (ab1 = ab2)
   "
-
 
 // ****************************************************************
 // ************** Helper Lemmas ***********************************

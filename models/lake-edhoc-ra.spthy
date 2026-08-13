@@ -134,10 +134,10 @@ let JudgeI = 0
 
 // Initiator with long term authentication key ~skI and long term DH share ~I
 // computerId is only used to keep track of the machine on which the key exists
-let I(~cid, ~skI, ~I, ID_CRED_R, ID_CRED_Att, pkV, ~cIV:channel) =
+let I(~cid, ~skI, ~I, ID_CRED_R, ID_CRED_Att, pkV, ~cIV:channel, ~X) =
     in(<method,suitesI,C_I,EAD_1>); // we let the attacker fully control the parameters used2 by a session
     event MethodOk(method);
-    new ~X; // DH share
+    // new ~X; // DH share
     event Share(~X);
     (
     	// CompromiseShare(~X) |    
@@ -176,7 +176,8 @@ let I(~cid, ~skI, ~I, ID_CRED_R, ID_CRED_Att, pkV, ~cIV:channel) =
 
 			if (verify(SIGNATURE_or_MAC_2,<'Signature1',ID_CRED_R,TH_2,pkR,EAD_2,MAC_2>, pkR) = sigtrue) then(
 
-				let EAD_3 = 'empty' in
+				new ~downlink_slot;
+				let EAD_3 = ~downlink_slot in
 				let TH_3 = hash(<wrap(TH_2), plaintext_2, pkR>) in
     	        event THIShared(pkI, TH_3);
 				let PRK_4e3m = PRK_3e2m in
@@ -193,7 +194,7 @@ let I(~cid, ~skI, ~I, ID_CRED_R, ID_CRED_Att, pkV, ~cIV:channel) =
 				let PRK_out = edhoc_kdf(PRK_4e3m, 'seven', TH_4, hash_length) in
 				event AcceptI(~cid,method_zero,pkI,pkR,PRK_3e2m,PRK_4e3m,PRK_out,~X,G_Y);
 				event SecretsI(~cid,method_zero,pkI,pkR,PRK_2e,PRK_3e2m,PRK_4e3m,PRK_out,KEYSTREAM_2,K_3,IV_3,~X,G_Y);
-				event SentMsg3_bg(~cid, pkI, pkR, TH_3);
+				event SentMsg3_bg(~cid, pkI, pkR, TH_3, ~downlink_slot);
 				out(m3);
 				(
 					(
@@ -244,7 +245,8 @@ let I(~cid, ~skI, ~I, ID_CRED_R, ID_CRED_Att, pkV, ~cIV:channel) =
 	    	let MAC_2 = edhoc_kdf(PRK_3e2m,'two', <ID_CRED_R, TH_2,  pkR, EAD_2>, hash_length) in
 
 	    	if (SIGNATURE_or_MAC_2 = MAC_2) then (
-				let EAD_3 = 'empty' in
+				new ~downlink_slot;
+				let EAD_3 = ~downlink_slot in
 				let TH_3 = hash(<wrap(TH_2), plaintext_2, pkR>) in
     	        event THIShared(pkI, TH_3);
 
@@ -262,7 +264,7 @@ let I(~cid, ~skI, ~I, ID_CRED_R, ID_CRED_Att, pkV, ~cIV:channel) =
 				let PRK_out = edhoc_kdf(PRK_4e3m, 'seven', TH_4, hash_length) in
 				event AcceptI(~cid,method_one,pkI,pkR,PRK_3e2m,PRK_4e3m,PRK_out,~X,G_Y);
 				event SecretsI(~cid,method_one,pkI,pkR,PRK_2e,PRK_3e2m,PRK_4e3m,PRK_out,KEYSTREAM_2,K_3,IV_3,~X,G_Y);
-				event SentMsg3_bg(~cid, pkI, pkR, TH_3);
+				event SentMsg3_bg(~cid, pkI, pkR, TH_3, ~downlink_slot);
 				out(m3);
 				(
 					(
@@ -312,7 +314,8 @@ let I(~cid, ~skI, ~I, ID_CRED_R, ID_CRED_Att, pkV, ~cIV:channel) =
 			let MAC_2 = edhoc_kdf(PRK_3e2m,'two', <ID_CRED_R, TH_2,  pkR, EAD_2>, hash_length) in
 
 			if (verify(SIGNATURE_or_MAC_2,<'Signature1',ID_CRED_R,TH_2,pkR,EAD_2,MAC_2>, pkR) = sigtrue) then(
-				let EAD_3 = 'empty' in
+				new ~downlink_slot;
+				let EAD_3 = ~downlink_slot in
 
 				let TH_3 = hash(<wrap(TH_2), plaintext_2, pkR>) in
     	        event THIShared(pkI, TH_3);
@@ -334,7 +337,7 @@ let I(~cid, ~skI, ~I, ID_CRED_R, ID_CRED_Att, pkV, ~cIV:channel) =
 				let PRK_out = edhoc_kdf(PRK_4e3m, 'seven', TH_4, hash_length) in
 				event AcceptI(~cid,method_two,pkI,pkR,PRK_3e2m,PRK_4e3m,PRK_out,~X,G_Y);
 				event SecretsI(~cid,method_two,pkI,pkR,PRK_2e,PRK_3e2m,PRK_4e3m,PRK_out,KEYSTREAM_2,K_3,IV_3,~X,G_Y);
-				event SentMsg3_bg(~cid, pkI, pkR, TH_3);
+				event SentMsg3_bg(~cid, pkI, pkR, TH_3, ~downlink_slot);
 				out(m3);
 				(
 					(
@@ -386,7 +389,8 @@ let I(~cid, ~skI, ~I, ID_CRED_R, ID_CRED_Att, pkV, ~cIV:channel) =
 	    	let MAC_2 = edhoc_kdf(PRK_3e2m,'two', <ID_CRED_R, TH_2,  pkR, EAD_2>, hash_length) in
 
 	    	if (SIGNATURE_or_MAC_2 = MAC_2) then (
-				let EAD_3 = 'empty' in
+				new ~downlink_slot;
+				let EAD_3 = ~downlink_slot in
 
 				let TH_3 = hash(<wrap(TH_2), plaintext_2, pkR>) in
     	        event THIShared(pkI, TH_3);
@@ -409,7 +413,7 @@ let I(~cid, ~skI, ~I, ID_CRED_R, ID_CRED_Att, pkV, ~cIV:channel) =
 				let PRK_out = edhoc_kdf(PRK_4e3m, 'seven', TH_4, hash_length) in
 				event AcceptI(~cid,method_three,pkI,pkR,PRK_3e2m,PRK_4e3m,PRK_out,~X,G_Y);
 				event SecretsI(~cid,method_three,pkI,pkR,PRK_2e,PRK_3e2m,PRK_4e3m,PRK_out,KEYSTREAM_2,K_3,IV_3,~X,G_Y);
-				event SentMsg3_bg(~cid, pkI, pkR, TH_3);
+				event SentMsg3_bg(~cid, pkI, pkR, TH_3, ~downlink_slot);
 				out(m3);
 		  		(
 					(
@@ -523,17 +527,17 @@ let R(~cid, ~skR, ~R, ~ak, ~measurement) =
 				let attestation_binder = edhoc_kdf(PRK_exporter, 'two', 'attestation', hash_length) in
 
 				let measurement_hash = hash(~measurement) in
-				new ~downlink_slot;
-				let signature_bg = sign(<'empty', ID_CRED_Att, measurement_hash, attestation_binder, ~downlink_slot>,'rep', ~ak) in
-				event EvidenceGenerated_bg(~cid, pkI, pkR, signature_bg, ~ak, ~Y, G_XY, attestation_binder, ~downlink_slot);
-				let EAD_4 = <ID_CRED_Att, signature_bg, ~downlink_slot> in
-				event SentByR(~cid, pkI, pkR, signature_bg, G_XY, G_X, G_Y, TH_3, ~ak, pk(~ak), ID_CRED_Att, attestation_binder, ~downlink_slot);
+				let downlink_slot = EAD_3 in
+				let signature_bg = sign(<'empty', ID_CRED_Att, measurement_hash, attestation_binder, downlink_slot>,'rep', ~ak) in
+				event EvidenceGenerated_bg(pkI, pkR, signature_bg, ~ak, attestation_binder, TH_3, downlink_slot);
+				let EAD_4 = <ID_CRED_Att, signature_bg, downlink_slot> in
+				event SentByR(~cid, pkI, pkR, signature_bg, G_XY, G_X, G_Y, TH_3, ~ak, pk(~ak), ID_CRED_Att, attestation_binder, downlink_slot);
 				let m4 = aeadenc(EAD_4, 'rep', K_4, ad_4) in
 				event AcceptR(~cid,method_zero,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X);
 				event AcceptRRA(~cid,method_zero,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X, G_XY);
 				event SecretsR(~cid,method_zero,pkI,pkR,PRK_2e,PRK_3e2m,PRK_4e3m,PRK_out,KEYSTREAM_2,K_3,IV_3,~Y,G_X);
 				event AcceptRData(PRK_out,method_zero,pkI,pkR,~Y,G_X,<TH_2,TH_3,TH_4,suitesI, EAD_1, EAD_2, EAD_3, m1, plaintext_2, plaintext_3>);
-				event Finish_R(~cid, method_zero, pkI, pkR, G_XY, ~Y, G_X, G_Y, signature_bg, measurement_hash, ID_CRED_Att, pk(~ak), attestation_binder, TH_3, ~downlink_slot);
+				event Finish_R(~cid, method_zero, pkI, pkR, G_XY, ~Y, G_X, G_Y, signature_bg, measurement_hash, ID_CRED_Att, pk(~ak), attestation_binder, TH_3, downlink_slot);
 				out(m4);
 				0
 			)
@@ -583,18 +587,18 @@ let R(~cid, ~skR, ~R, ~ak, ~measurement) =
 				let attestation_binder = edhoc_kdf(PRK_exporter, 'two', 'attestation', hash_length) in
 
 				let measurement_hash = hash(~measurement) in
-				new ~downlink_slot;
-				let signature_bg = sign(<'empty', ID_CRED_Att, measurement_hash, attestation_binder, ~downlink_slot>,'rep', ~ak) in
-				event EvidenceGenerated_bg(~cid, pkI, pkR, signature_bg, ~ak, ~Y, G_XY, attestation_binder, ~downlink_slot);
-				let EAD_4 = <ID_CRED_Att, signature_bg, ~downlink_slot> in
-				event SentByR(~cid, pkI, pkR, signature_bg, G_XY, G_X, G_Y, TH_3, ~ak, pk(~ak), ID_CRED_Att, attestation_binder, ~downlink_slot);
+				let downlink_slot = EAD_3 in
+				let signature_bg = sign(<'empty', ID_CRED_Att, measurement_hash, attestation_binder, downlink_slot>,'rep', ~ak) in
+				event EvidenceGenerated_bg(pkI, pkR, signature_bg, ~ak, attestation_binder, TH_3, downlink_slot);
+				let EAD_4 = <ID_CRED_Att, signature_bg, downlink_slot> in
+				event SentByR(~cid, pkI, pkR, signature_bg, G_XY, G_X, G_Y, TH_3, ~ak, pk(~ak), ID_CRED_Att, attestation_binder, downlink_slot);
 
 				let m4 = aeadenc(EAD_4, 'rep', K_4, ad_4) in
 				event AcceptR(~cid,method_one,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X);
 				event AcceptRRA(~cid,method_one,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X, G_XY);
 				event SecretsR(~cid,method_one,pkI,pkR,PRK_2e,PRK_3e2m,PRK_4e3m,PRK_out,KEYSTREAM_2,K_3,IV_3,~Y,G_X);
 				event AcceptRData(PRK_out,method_one,pkI,pkR,~Y,G_X,<TH_2,TH_3,TH_4,suitesI, EAD_1, EAD_2, EAD_3, m1, plaintext_2, plaintext_3>);
-				event Finish_R(~cid, method_one, pkI, pkR, G_XY, ~Y, G_X, G_Y, signature_bg, measurement_hash, ID_CRED_Att, pk(~ak), attestation_binder, TH_3, ~downlink_slot);
+				event Finish_R(~cid, method_one, pkI, pkR, G_XY, ~Y, G_X, G_Y, signature_bg, measurement_hash, ID_CRED_Att, pk(~ak), attestation_binder, TH_3, downlink_slot);
 				out(m4);
 				0
 			)
@@ -646,18 +650,18 @@ let R(~cid, ~skR, ~R, ~ak, ~measurement) =
 				let attestation_binder = edhoc_kdf(PRK_exporter, 'two', 'attestation', hash_length) in
 
 				let measurement_hash = hash(~measurement) in
-				new ~downlink_slot;
-				let signature_bg = sign(<'empty', ID_CRED_Att, measurement_hash, attestation_binder, ~downlink_slot>,'rep', ~ak) in
-				event EvidenceGenerated_bg(~cid, pkI, pkR, signature_bg, ~ak, ~Y, G_XY, attestation_binder, ~downlink_slot);
-				let EAD_4 = <ID_CRED_Att, signature_bg, ~downlink_slot> in
-				event SentByR(~cid, pkI, pkR, signature_bg, G_XY, G_X, G_Y, TH_3, ~ak, pk(~ak), ID_CRED_Att, attestation_binder, ~downlink_slot);
+				let downlink_slot = EAD_3 in
+				let signature_bg = sign(<'empty', ID_CRED_Att, measurement_hash, attestation_binder, downlink_slot>,'rep', ~ak) in
+				event EvidenceGenerated_bg(pkI, pkR, signature_bg, ~ak, attestation_binder, TH_3, downlink_slot);
+				let EAD_4 = <ID_CRED_Att, signature_bg, downlink_slot> in
+				event SentByR(~cid, pkI, pkR, signature_bg, G_XY, G_X, G_Y, TH_3, ~ak, pk(~ak), ID_CRED_Att, attestation_binder, downlink_slot);
 
 				let m4 = aeadenc(EAD_4, 'rep', K_4, ad_4) in
 				event AcceptR(~cid,method_two,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X);
 				event AcceptRRA(~cid,method_two,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X, G_XY);
 				event SecretsR(~cid,method_two,pkI,pkR,PRK_2e,PRK_3e2m,PRK_4e3m,PRK_out,KEYSTREAM_2,K_3,IV_3,~Y,G_X);
 				event AcceptRData(PRK_out,method_two,pkI,pkR,~Y,G_X,<TH_2,TH_3,TH_4,suitesI, EAD_1, EAD_2, EAD_3, m1, plaintext_2, plaintext_3>);
-				event Finish_R(~cid, method_two, pkI, pkR, G_XY, ~Y, G_X, G_Y, signature_bg, measurement_hash, ID_CRED_Att, pk(~ak), attestation_binder, TH_3, ~downlink_slot);
+				event Finish_R(~cid, method_two, pkI, pkR, G_XY, ~Y, G_X, G_Y, signature_bg, measurement_hash, ID_CRED_Att, pk(~ak), attestation_binder, TH_3, downlink_slot);
 				out(m4);
 				0
 			)
@@ -713,18 +717,18 @@ let R(~cid, ~skR, ~R, ~ak, ~measurement) =
 				let attestation_binder = edhoc_kdf(PRK_exporter, 'two', 'attestation', hash_length) in
 
 				let measurement_hash = hash(~measurement) in
-				new ~downlink_slot;
-				let signature_bg = sign(<'empty', ID_CRED_Att, measurement_hash, attestation_binder, ~downlink_slot>,'rep', ~ak) in
-				event EvidenceGenerated_bg(~cid, pkI, pkR, signature_bg, ~ak, ~Y, G_XY, attestation_binder, ~downlink_slot);
-				let EAD_4 = <ID_CRED_Att, signature_bg, ~downlink_slot> in
-				event SentByR(~cid, pkI, pkR, signature_bg, G_XY, G_X, G_Y, TH_3, ~ak, pk(~ak), ID_CRED_Att, attestation_binder, ~downlink_slot);
+				let downlink_slot = EAD_3 in
+				let signature_bg = sign(<'empty', ID_CRED_Att, measurement_hash, attestation_binder, downlink_slot>,'rep', ~ak) in
+				event EvidenceGenerated_bg(pkI, pkR, signature_bg, ~ak, attestation_binder, TH_3, downlink_slot);
+				let EAD_4 = <ID_CRED_Att, signature_bg, downlink_slot> in
+				event SentByR(~cid, pkI, pkR, signature_bg, G_XY, G_X, G_Y, TH_3, ~ak, pk(~ak), ID_CRED_Att, attestation_binder, downlink_slot);
 
 				let m4 = aeadenc(EAD_4, 'rep', K_4, ad_4) in
 				event AcceptR(~cid,method_three,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X);
 				event AcceptRRA(~cid,method_three,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X, G_XY);
 				event SecretsR(~cid,method_three,pkI,pkR,PRK_2e,PRK_3e2m,PRK_4e3m,PRK_out,KEYSTREAM_2,K_3,IV_3,~Y,G_X);
 				event AcceptRData(PRK_out,method_three,pkI,pkR,~Y,G_X,<TH_2,TH_3,TH_4,suitesI, EAD_1, EAD_2, EAD_3, m1, plaintext_2, plaintext_3>);
-				event Finish_R(~cid, method_three, pkI, pkR, G_XY, ~Y, G_X, G_Y, signature_bg, measurement_hash, ID_CRED_Att, pk(~ak), attestation_binder, TH_3, ~downlink_slot);
+				event Finish_R(~cid, method_three, pkI, pkR, G_XY, ~Y, G_X, G_Y, signature_bg, measurement_hash, ID_CRED_Att, pk(~ak), attestation_binder, TH_3, downlink_slot);
 				out(m4);
 				0
 			)
@@ -798,7 +802,9 @@ event Honest(pk(~skV));
 	      event Honest( 'g'^~ltdh );
 		  event Honest(pk(~ak));
 		  event Honest(hash(~measurement));
-	( (! in(cred); I(~computerId,~sk, ~ltdh, cred, idd_att, pk(~skV), ~cIV)) | (!R(~computerId,~sk,~ltdh, ~ak, ~measurement )) | compromise(~sk) | compromiseDH(~ltdh) | LeakAttKey(~ak) ) )
+	
+	( (! new ~X; (! (in(cred); I(~computerId,~sk, ~ltdh, cred, idd_att, pk(~skV), ~cIV, ~X)))) | (!R(~computerId,~sk,~ltdh, ~ak, ~measurement )) | compromise(~sk) | compromiseDH(~ltdh) | LeakAttKey(~ak) ) )
+		  // ( (! in(cred); I(~computerId,~sk, ~ltdh, cred, idd_att, pk(~skV), ~cIV)) | (!R(~computerId,~sk,~ltdh, ~ak, ~measurement )) | compromise(~sk) | compromiseDH(~ltdh) | LeakAttKey(~ak) ) )
 )
 
 
