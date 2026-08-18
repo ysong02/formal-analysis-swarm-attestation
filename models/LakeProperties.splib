@@ -11,15 +11,15 @@
 
 lemma executableR_method_1[output=[proverif]]: // sanity check
     exists-trace
-    "Ex cid e1 e2 pkI pkR k3 ko #i. AcceptR(cid,method_one,pkI,pkR,k3,ko,e1,e2)@i"
+    "Ex cid e1 e2 pkI pkR k3 k4 ko #i. AcceptR(cid,method_one,pkI,pkR,k3,k4,ko,e1,e2)@i"
 
 lemma executableR_method_2[output=[proverif]]: // sanity check
     exists-trace
-    "Ex cid e1 e2 pkI pkR k3 ko #i. AcceptR(cid,method_two,pkI,pkR,k3,ko,e1,e2)@i"
+    "Ex cid e1 e2 pkI pkR k3 k4 ko #i. AcceptR(cid,method_two,pkI,pkR,k3,k4,ko,e1,e2)@i"
 
 lemma executableR_method_3[output=[proverif]]: // sanity check
     exists-trace
-    "Ex cid e1 e2 pkI pkR k3 ko #i. AcceptR(cid,method_three,pkI,pkR,k3,ko,e1,e2)@i"
+    "Ex cid e1 e2 pkI pkR k3 k4 ko #i. AcceptR(cid,method_three,pkI,pkR,k3,k4,ko,e1,e2)@i"
 
 lemma executableI_method_1[output=[proverif]]: // sanity check
   exists-trace
@@ -39,7 +39,7 @@ lemma executableI_method_3[output=[proverif]]: // sanity check
 
 lemma executableR_method_0[output=[proverif]]: // sanity check
   exists-trace
-  "Ex cid e1 e2 pkI pkR k3 ko #i #j #l. AcceptR(cid,method_zero,pkI,pkR,k3,ko,e1,e2)@i & Honest(pkI)@j & Honest(pkR)@l"
+  "Ex cid e1 e2 pkI pkR k3 k4 ko #i #j #l. AcceptR(cid,method_zero,pkI,pkR,k3,k4,ko,e1,e2)@i & Honest(pkI)@j & Honest(pkR)@l"
 
 lemma executableI_method_0[output=[proverif]]: // sanity check
   exists-trace
@@ -83,18 +83,19 @@ lemma EvidenceUniqueness2:
 // Attestation Evidence integrity -> the evidence the Verifier checks was not
 // modified/tampered with after the Responder generated it.
 lemma AttestationEvidenceIntegrity:
-  "All pkI pkR sig ab pkak #i #j #k.
-    VerifiedSignature_bg(pkI, pkR, sig, ab, pkak)@i
-    &
-    Honest(pkI)@j
-    &
-    Honest(pkR)@k
+  "All pkI pkR sig ab ak #i.
+  //  #j #k.
+    VerifiedSignature_bg(pkI, pkR, sig, ab, pk(ak))@i
+    // &
+    // Honest(pkI)@j
+    // &
+    // Honest(pkR)@k
   ==>
-  (Ex ak th3 downlink_slot #t.
-    EvidenceGenerated_bg(pkI, pkR, sig, ak, ab, th3, downlink_slot)@t
-    & t < i)
+  (Ex th3 downlink_slot #t.
+    EvidenceGenerated_bg(pkI, pkR, sig, ak, ab, th3, downlink_slot)@t 
+    & t < i )
   |
-  (Ex ak #t. LeakAttKey(ak)@t)
+  (Ex #t. LeakAttKey(ak)@t)
   |
   (Ex #t.  Compromise(pkI)@t)
   |
@@ -105,20 +106,16 @@ lemma AttestationEvidenceIntegrity:
 // finishes trusting a Verifier decision, the Responder must have finished the matching
 // EDHOC session, unless a long-term key was compromised.
 lemma AgreementParameters:
-  "All cidI method pkI pkR gxy x gx gy ab idatt pkv th3 uplink_slot #i #j #k.
-     Finish_I(cidI, method, pkI, pkR, gxy, x, gx, gy, ab, idatt, pkv, th3, uplink_slot)@i
-     &
-     Honest(pkI)@j
-     &
-     Honest(pkR)@k
+  "All cidI method pkI pkR gxy x gx gy ab meas pkv th3 uplink_slot ak #i #j #k.
+    Finish_I(cidI, method, pkI, pkR, gxy, x, gx, gy, ab, id_att(hash(meas), pk(ak)), pkv, th3, uplink_slot)@i
    ==>
-   (Ex cidR y sig meas pkak dl #t. Finish_R(cidR, method, pkI, pkR, gxy, y, gx, gy, sig, meas, idatt, pkak, ab, th3, dl)@t & t < i )
+   (Ex cidR y sig dl #t. Finish_R(cidR, method, pkI, pkR, gxy, y, gx, gy, sig, meas, id_att(hash(meas), pk(ak)), pk(ak), ab, th3, dl)@t & t < i )
     |
     (Ex #t. Compromise(pkR)@t & t < i)
     |
     (Ex #t. Compromise(pkI)@t & t < i)
     |
-    (Ex ak #t. LeakAttKey(ak)@t & t < i)
+    (Ex #t. LeakAttKey(ak)@t & t < i)
     |
     (Ex #t. Compromise(pkv)@t & t < i)
     "
@@ -128,18 +125,19 @@ lemma AgreementParameters:
 // sent, all tied together by the same attestation_binder and the same th3
 
 lemma ChannelBindingEvidence:
-"All pkI pkR sig ab pkak idatt uplink_slot pkv #j.
-    AttestationAccepted_bg(pkI, pkR, sig, ab, pkak, idatt, uplink_slot, pkv)@j
+"All pkI pkR sig ab ak meas uplink_slot pkv #j.
+    AttestationAccepted_bg(pkI, pkR, sig, ab, pk(ak), id_att(hash(meas), pk(ak)), uplink_slot, pkv)@j
   ==>
-    (Ex cidI cidR gxy gx gy th3 ak dl #i #h.
+    (Ex cidI cidR gxy gx gy th3 dl #i #h.
         ForwardedToVerifier_bg(cidI, pkI, pkR, uplink_slot, ab, th3)@i
-        & SentByR(cidR, pkI, pkR, sig, gxy, gx, gy, th3, ak, pkak, idatt, ab, dl)@h
+        & SentByR(cidR, pkI, pkR, sig, gxy, gx, gy, th3, ak, pk(ak), id_att(hash(meas), pk(ak)), ab, dl)@h
         & h < i
         & i < j
     )
     |
-    (Ex ak #t. LeakAttKey(ak)@t)
+    (Ex #t. LeakAttKey(ak)@t)
 "
+
 
 // Result integrity -> the decision the Relying Party trusts was genuinely
 // rendered by the Verifier for this exact evidence, unless the Verifier's own long-term
@@ -286,48 +284,67 @@ After verifying message_3, the Responder is assured that
 */
 
 // Non injective authentication
-// lemma honestauthRI_non_inj:  
-//     "All cid m pkI pkR k4 ko y gx #i #k. AcceptR(cid,m,pkI,pkR,k4,ko,y,gx)@i  & Honest(pkI)@k ==>    
+//
+// NOTE: extended with a LeakAttKey escape. Since the attestation key ~ak is
+// signed/verified with the same sign/pk scheme as EDHOC identity keys, and
+// Honest(pk(~ak)) is fired unconditionally at agent creation just like
+// Honest(pk(~sk)), a leaked ~ak lets the attacker forge pk(ak) as a fully
+// "Honest" but fake Initiator identity in a totally unrelated session
+// (confirmed by a Tamarin trace: LeakAttKey(ak) followed by a forged
+// AcceptR for method_one using pk(ak) as pkI, with no matching AcceptI).
+// Without this escape the lemma is false purely because of that reuse, not
+// because of any weakness in message_3 authentication itself.
+// lemma honestauthRI_non_inj:
+//     "All cid m pkI pkR k3r k4 ko y gx #i #k. AcceptR(cid,m,pkI,pkR,k3r,k4,ko,y,gx)@i  & Honest(pkI)@k ==>
 //        (Ex #t x gy k3 ko2 cid2. t<i & AcceptI(cid2,m,pkI,pkR,k3,k4,ko2,x,gy)@t) // honest case
 //        |  (Ex #t.  Compromise(pkI)@t & t<i)   // the initiator long term key was compromised before the completion of the exchange
 //        |  (Ex #t.  LeakShare(y)@t & (m=method_two | m =method_three)
 //        // the responder share was leaked, and the initiator is not authenticating with sig
-//            )  
-
+//            )
+//        |  (Ex ak #t. LeakAttKey(ak)@t & pkI = pk(ak))
+//        // pkI is actually an attestation key whose leak lets the attacker
+//        // forge it as a fake Initiator identity, not a real EDHOC identity key
 //     "
 
-// // Uniqueness implies injective authentication
-// lemma honestauthRI_unique:  
-//     "All cid m pkI pkR k4 ko y gx #i #j #k. 
+// Uniqueness implies injective authentication
+// lemma honestauthRI_unique:
+//     "All cid m pkI pkR k3 k4 ko y gx #i #j #k.
 //      (
-//      AcceptR(cid,m,pkI,pkR,k4,ko,y,gx)@i & AcceptR(cid,m,pkI,pkR,k4,ko,y,gx)@j & Honest(pkI)@k  ==> 
+//      AcceptR(cid,m,pkI,pkR,k3,k4,ko,y,gx)@i & AcceptR(cid,m,pkI,pkR,k3,k4,ko,y,gx)@j & Honest(pkI)@k  ==>
 //      (Ex #t.  Compromise(pkI)@t)
 //      |  (Ex #t.  LeakShare(y)@t & (m=method_two | m =method_three)
 
-//            )   // the responder share was leaked, and the initiator is not authenticating with sig     
+//            )   // the responder share was leaked, and the initiator is not authenticating with sig
 //      |
 //      (Ex #t. Honest(pkI)@t &    #i = #j) // hack, dumb honest event added due to restrictions on exportable lemmas to proverif
 //      )"
 
 
-// // The following lemmas do not correspond to any security property mentioned in the draft
-// // They correspond to the implicit autentication on the other side, which is made explicit after a key confirmation
+// The following lemmas do not correspond to any security property mentioned in the draft
+// They correspond to the implicit autentication on the other side, which is made explicit after a key confirmation
+//
+// NOTE: extended with a LeakAttKey escape, mirroring honestauthRI_non_inj. A
+// leaked ~ak lets the attacker forge pk(ak) as a fake "Honest" Responder
+// identity in message 2 (signed with the leaked ak), with no genuine
+// DerivedR ever having run for it. Confirmed false for method_zero without
+// this escape.
 // lemma honestauthIR_non_inj:  // should be true
 //     "All m pkI pkR k3 k4 ko gy x cid #i #k. AcceptI(cid,m,pkI,pkR,k3,k4,ko,x,gy)@i & Honest(pkR)@k ==>
 //     (
 //        (Ex #j y gx cid2. j<i & DerivedR(cid2,pkR,k3,y,gx)@j)
 //       |  (Ex #t.  Compromise(pkR)@t)
 //      |  (Ex #t.  LeakShare(x)@t & (m=method_one | m =method_three)      )
+//      |  (Ex ak #t. LeakAttKey(ak)@t & pkR = pk(ak))
 //     )"
 
-// lemma honestauthIR_unique:  
-//     "All m pkI pkR k3 k4 ko x gy cid #i #j #k. 
+// lemma honestauthIR_unique:
+//     "All m pkI pkR k3 k4 ko x gy cid #i #j #k.
 //      (
-//      AcceptI(cid,m,pkI,pkR,k3,k4,ko,x,gy)@i & AcceptI(cid,m,pkI,pkR,k3,k4,ko,x,gy)@j & Honest(pkI)@k  ==> 
+//      AcceptI(cid,m,pkI,pkR,k3,k4,ko,x,gy)@i & AcceptI(cid,m,pkI,pkR,k3,k4,ko,x,gy)@j & Honest(pkI)@k  ==>
 //      (Ex #t.  Compromise(pkI)@t)
 //      |  (Ex #t.  LeakShare(x)@t & (m=method_one | m =method_three)
 
-//            )   // the responder share was leaked, and the initiator is not authenticating with sig     
+//            )   // the responder share was leaked, and the initiator is not authenticating with sig
 //      |
 //      (Ex #t. Honest(pkI)@t &    #i = #j) // hack, dumb honest event added due to restrictions on exportable lemmas to proverif
 //      )"
@@ -427,16 +444,17 @@ After verifying message_3, the Responder is assured that
 // This crucially requires that even with a man in the middle, or with a non trusted session, or with a compromise identity, session keys are unique. We cover this in the two following lemmas.
 // */
 
-// lemma authRI_unique:  
-//     "All m cid pkI pkR k4 ko y1 gx1 y2 gx2 #i #j. 
-//      (
-//      AcceptR(cid,m,pkI,pkR,k4,ko,y1,gx1)@i & AcceptR(cid,m,pkI,pkR,k4,ko,y2,gx2)@j  ==> #i = #j
-//      )"
+lemma authRI_unique:
+    "All m cid pkI pkR k3 k4 ko y1 gx1 y2 gx2 #i #j #k.
+     (
+     AcceptR(cid,m,pkI,pkR,k3,k4,ko,y1,gx1)@i & AcceptR(cid,m,pkI,pkR,k3,k4,ko,y2,gx2)@j & Honest(pkI)@k ==>
+     (Ex #t. Honest(pkI)@t & #i = #j) // hack, dumb honest event added due to restrictions on exportable lemmas to proverif
+     )"
 
 
-// lemma authIR_unique:  
-//     "All m pkI pkR k3 k4 ko x gy x2 gy2 cid #i #j.      
-//      AcceptI(cid,m,pkI,pkR,k3,k4,ko,x,gy)@i & AcceptI(cid,m,pkI,pkR,k3,k4,ko,x2,gy2)@j  ==> 
-//      #i = #j"
+lemma authIR_unique:
+    "All m pkI pkR k3 k4 ko x gy x2 gy2 cid #i #j.
+     AcceptI(cid,m,pkI,pkR,k3,k4,ko,x,gy)@i & AcceptI(cid,m,pkI,pkR,k3,k4,ko,x2,gy2)@j  ==>
+     #i = #j"
 
 
