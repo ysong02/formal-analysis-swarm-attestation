@@ -1,9 +1,6 @@
 
 /*
- * Protocol:   LAKE
-   https://datatracker.ietf.org/doc/html/draft-ietf-lake-edhoc-12
-
-   A lightweight DH based key exchange.
+ * Protocol:   SALSA
 
 
 # Weaker primitive modeling and compromises
