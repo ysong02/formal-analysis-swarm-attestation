@@ -1,6 +1,6 @@
 This repository contains the models for the formal analysis of the SALSA.
 
-This work builds on prior formal analyses of the LAKE EDHOC protocol, in particular the results reported in the paper `A comprehensive, formal and automated analysis of the EDHOC protocol`- Charlie Jacomme, Elise Klein, Steve Kremer, Maïwenn Racouchot, USENIX'23,  https://hal.inria.fr/hal-03810102/.
+This work builds on prior formal analyses, in particular the results reported in the paper `A comprehensive, formal and automated analysis of the EDHOC protocol`- Charlie Jacomme, Elise Klein, Steve Kremer, Maïwenn Racouchot, USENIX'23,  https://hal.inria.fr/hal-03810102/.
 
 ## 📌 Goals
 
