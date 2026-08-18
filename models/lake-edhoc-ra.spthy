@@ -69,9 +69,7 @@ equations:  get_DH_cred(id(x,y))=y,
 
 
 
-
-
-
+#define MethodZero
 #include "Headers.splib"
 
 
@@ -533,7 +531,7 @@ let R(~cid, ~skR, ~R, ~ak, ~measurement) =
 				let EAD_4 = <ID_CRED_Att, signature_bg, downlink_slot> in
 				event SentByR(~cid, pkI, pkR, signature_bg, G_XY, G_X, G_Y, TH_3, ~ak, pk(~ak), ID_CRED_Att, attestation_binder, downlink_slot);
 				let m4 = aeadenc(EAD_4, 'rep', K_4, ad_4) in
-				event AcceptR(~cid,method_zero,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X);
+				event AcceptR(~cid,method_zero,pkI,pkR,PRK_3e2m,PRK_4e3m,PRK_out,~Y,G_X);
 				event AcceptRRA(~cid,method_zero,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X, G_XY);
 				event SecretsR(~cid,method_zero,pkI,pkR,PRK_2e,PRK_3e2m,PRK_4e3m,PRK_out,KEYSTREAM_2,K_3,IV_3,~Y,G_X);
 				event AcceptRData(PRK_out,method_zero,pkI,pkR,~Y,G_X,<TH_2,TH_3,TH_4,suitesI, EAD_1, EAD_2, EAD_3, m1, plaintext_2, plaintext_3>);
@@ -594,7 +592,7 @@ let R(~cid, ~skR, ~R, ~ak, ~measurement) =
 				event SentByR(~cid, pkI, pkR, signature_bg, G_XY, G_X, G_Y, TH_3, ~ak, pk(~ak), ID_CRED_Att, attestation_binder, downlink_slot);
 
 				let m4 = aeadenc(EAD_4, 'rep', K_4, ad_4) in
-				event AcceptR(~cid,method_one,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X);
+				event AcceptR(~cid,method_one,pkI,pkR,PRK_3e2m,PRK_4e3m,PRK_out,~Y,G_X);
 				event AcceptRRA(~cid,method_one,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X, G_XY);
 				event SecretsR(~cid,method_one,pkI,pkR,PRK_2e,PRK_3e2m,PRK_4e3m,PRK_out,KEYSTREAM_2,K_3,IV_3,~Y,G_X);
 				event AcceptRData(PRK_out,method_one,pkI,pkR,~Y,G_X,<TH_2,TH_3,TH_4,suitesI, EAD_1, EAD_2, EAD_3, m1, plaintext_2, plaintext_3>);
@@ -657,7 +655,7 @@ let R(~cid, ~skR, ~R, ~ak, ~measurement) =
 				event SentByR(~cid, pkI, pkR, signature_bg, G_XY, G_X, G_Y, TH_3, ~ak, pk(~ak), ID_CRED_Att, attestation_binder, downlink_slot);
 
 				let m4 = aeadenc(EAD_4, 'rep', K_4, ad_4) in
-				event AcceptR(~cid,method_two,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X);
+				event AcceptR(~cid,method_two,pkI,pkR,PRK_3e2m,PRK_4e3m,PRK_out,~Y,G_X);
 				event AcceptRRA(~cid,method_two,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X, G_XY);
 				event SecretsR(~cid,method_two,pkI,pkR,PRK_2e,PRK_3e2m,PRK_4e3m,PRK_out,KEYSTREAM_2,K_3,IV_3,~Y,G_X);
 				event AcceptRData(PRK_out,method_two,pkI,pkR,~Y,G_X,<TH_2,TH_3,TH_4,suitesI, EAD_1, EAD_2, EAD_3, m1, plaintext_2, plaintext_3>);
@@ -724,7 +722,7 @@ let R(~cid, ~skR, ~R, ~ak, ~measurement) =
 				event SentByR(~cid, pkI, pkR, signature_bg, G_XY, G_X, G_Y, TH_3, ~ak, pk(~ak), ID_CRED_Att, attestation_binder, downlink_slot);
 
 				let m4 = aeadenc(EAD_4, 'rep', K_4, ad_4) in
-				event AcceptR(~cid,method_three,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X);
+				event AcceptR(~cid,method_three,pkI,pkR,PRK_3e2m,PRK_4e3m,PRK_out,~Y,G_X);
 				event AcceptRRA(~cid,method_three,pkI,pkR,PRK_4e3m,PRK_out,~Y,G_X, G_XY);
 				event SecretsR(~cid,method_three,pkI,pkR,PRK_2e,PRK_3e2m,PRK_4e3m,PRK_out,KEYSTREAM_2,K_3,IV_3,~Y,G_X);
 				event AcceptRData(PRK_out,method_three,pkI,pkR,~Y,G_X,<TH_2,TH_3,TH_4,suitesI, EAD_1, EAD_2, EAD_3, m1, plaintext_2, plaintext_3>);
