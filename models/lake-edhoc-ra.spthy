@@ -69,7 +69,6 @@ equations:  get_DH_cred(id(x,y))=y,
 
 
 
-#define MethodZero
 #include "Headers.splib"
 
 
@@ -785,6 +784,7 @@ process:
 |
 new ~cIV:channel; // secure channel between any Relying Party and the Verifier service
 new ~skV; // Verifier's long-term signing key
+new ~cProv:channel;
 event Honest(pk(~skV));
 (
 	(!V(pk(~skV), ~skV, ~cIV))
@@ -795,14 +795,15 @@ event Honest(pk(~skV));
 	    let idd = id(pk(~sk), 'g'^~ltdh) in
 	    out(<idd, pk(~sk), 'g'^~ltdh>);
 		let idd_att = id_att(hash(~measurement), pk(~ak)) in
+		out(idd_att); 
+		out(~cProv, idd_att); 
 	    event ShareLT(~ltdh);
 	      event Honest(pk(~sk));
 	      event Honest( 'g'^~ltdh );
 		  event Honest(pk(~ak));
 		  event Honest(hash(~measurement));
-	
-	( (! new ~X; (! (in(cred); I(~computerId,~sk, ~ltdh, cred, idd_att, pk(~skV), ~cIV, ~X)))) | (!R(~computerId,~sk,~ltdh, ~ak, ~measurement )) | compromise(~sk) | compromiseDH(~ltdh) | LeakAttKey(~ak) ) )
-		  // ( (! in(cred); I(~computerId,~sk, ~ltdh, cred, idd_att, pk(~skV), ~cIV)) | (!R(~computerId,~sk,~ltdh, ~ak, ~measurement )) | compromise(~sk) | compromiseDH(~ltdh) | LeakAttKey(~ak) ) )
+
+	( (! new ~X; (! (in(cred); in(~cProv, cred_att); I(~computerId,~sk, ~ltdh, cred, cred_att, pk(~skV), ~cIV, ~X)))) | (!R(~computerId,~sk,~ltdh, ~ak, ~measurement )) | compromise(~sk) | compromiseDH(~ltdh) | LeakAttKey(~ak) ) )
 )
 
 
